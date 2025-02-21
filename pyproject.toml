@@ -14,5 +14,6 @@ dependencies = [
     "pytz>=2025.1",
     "soundfile>=0.13.1",
     "transformers>=4.48.3",
-    "spacy<=3.7.3"
+    "spacy<=3.7.3",
+    "ruff>=0.9.7",
 ]
