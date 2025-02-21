@@ -14,10 +14,12 @@ def extract_webpage_content(url: str) -> tuple[str, str] or None:
             print(f"We expect input files at {ARTICLE_FILE} and {ARTICLE_TITLE_FILE}")
             return None
 
-        title = open(ARTICLE_TITLE_FILE, 'r', encoding='utf-8').read()
+        with open(ARTICLE_TITLE_FILE, "r", encoding="utf-8") as f:
+            title = f.read()
         os.remove(ARTICLE_TITLE_FILE)
 
-        contents = open(ARTICLE_FILE, 'r', encoding='utf-8').read()
+        with open(ARTICLE_FILE, "r", encoding="utf-8") as f:
+            contents = f.read()
         os.remove(ARTICLE_FILE)
 
         return title, contents
