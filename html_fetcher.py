@@ -10,6 +10,7 @@ LINK_PATTERN = r"<[ ]*link.*?>"
 BASE64_IMG_PATTERN = r'<img[^>]+src="data:image/[^;]+;base64,[^"]+"[^>]*>'
 SVG_PATTERN = r"(<svg[^>]*>)(.*?)(<\/svg>)"
 
+
 class HTMLCleaner:
     def __init__(self, html: str, clean_svg: bool = False, clean_base64: bool = False):
         self.html = html
@@ -28,22 +29,40 @@ class HTMLCleaner:
         )
 
     def replace_base64_images(self, new_image_src: str = "#"):
-        self.html = re.sub(BASE64_IMG_PATTERN, f'<img src="{new_image_src}"/>', self.html)
+        self.html = re.sub(
+            BASE64_IMG_PATTERN, f'<img src="{new_image_src}"/>', self.html
+        )
 
     def remove_script(self):
-        self.html = re.sub(SCRIPT_PATTERN, "", self.html, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
+        self.html = re.sub(
+            SCRIPT_PATTERN,
+            "",
+            self.html,
+            flags=re.IGNORECASE | re.MULTILINE | re.DOTALL,
+        )
 
     def remove_style(self):
-        self.html = re.sub(STYLE_PATTERN, "", self.html, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
+        self.html = re.sub(
+            STYLE_PATTERN, "", self.html, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL
+        )
 
     def remove_meta(self):
-        self.html = re.sub(META_PATTERN, "", self.html, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
+        self.html = re.sub(
+            META_PATTERN, "", self.html, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL
+        )
 
     def remove_comment(self):
-        self.html = re.sub(COMMENT_PATTERN, "", self.html, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
+        self.html = re.sub(
+            COMMENT_PATTERN,
+            "",
+            self.html,
+            flags=re.IGNORECASE | re.MULTILINE | re.DOTALL,
+        )
 
     def remove_link(self):
-        self.html = re.sub(LINK_PATTERN, "", self.html, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
+        self.html = re.sub(
+            LINK_PATTERN, "", self.html, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL
+        )
 
     def clean_html(self):
         self.remove_script()
@@ -57,6 +76,7 @@ class HTMLCleaner:
         if self.clean_base64:
             self.replace_base64_images()
         return self.html
+
 
 def get_clean_html_from_url(url: str) -> str:
     return HTMLCleaner(requests.get(url).text, clean_svg=True, clean_base64=True).run()

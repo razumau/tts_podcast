@@ -1,14 +1,14 @@
 import subprocess
 import os
 
-BUN_SCRIPT = 'extract_article.ts'
-ARTICLE_TITLE_FILE = 'extracted_article_title.txt'
-ARTICLE_FILE = 'extracted_article.txt'
+BUN_SCRIPT = "extract_article.ts"
+ARTICLE_TITLE_FILE = "extracted_article_title.txt"
+ARTICLE_FILE = "extracted_article.txt"
 
 
 def extract_webpage_content(url: str) -> tuple[str, str] or None:
     try:
-        subprocess.run(['bun', BUN_SCRIPT, url], check=True)
+        subprocess.run(["bun", BUN_SCRIPT, url], check=True)
 
         if not (os.path.exists(ARTICLE_FILE) and os.path.exists(ARTICLE_TITLE_FILE)):
             print(f"We expect input files at {ARTICLE_FILE} and {ARTICLE_TITLE_FILE}")
