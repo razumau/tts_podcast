@@ -16,4 +16,5 @@ dependencies = [
     "transformers>=4.48.3",
     "spacy<=3.7.3",
     "ruff>=0.9.7",
+    "elevenlabs>=1.51.0",
 ]

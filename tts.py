@@ -1,7 +1,9 @@
+from models.eleven import ElevenLabsTTS
 from models.kokoro import KokoroTTS
 
 MODELS = {
     "kokoro": KokoroTTS,
+    "eleven": ElevenLabsTTS,
 }
 
 
