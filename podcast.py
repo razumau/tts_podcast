@@ -61,27 +61,21 @@ class PodcastFeed:
 
     def load_existing_episodes(self):
         try:
-            self.s3_client.download_file(
-                self.r2.bucket_name, "feed.xml", "existing_feed.xml"
-            )
+            self.s3_client.download_file(self.r2.bucket_name, "feed.xml", "existing_feed.xml")
             existing_feed = feedparser.parse("existing_feed.xml")
 
             for entry in existing_feed.entries:
                 fe = self.fg.add_entry()
                 fe.id(entry.id)
                 fe.title(entry.title)
-                fe.description(
-                    entry.description if "description" in entry else entry.title
-                )
+                fe.description(entry.description if "description" in entry else entry.title)
 
                 if "enclosures" in entry and entry.enclosures:
                     enclosure = entry.enclosures[0]
                     fe.enclosure(enclosure.href, enclosure.length, enclosure.type)
 
                 if "published_parsed" in entry:
-                    published_date = datetime(
-                        *entry.published_parsed[:6], tzinfo=pytz.UTC
-                    )
+                    published_date = datetime(*entry.published_parsed[:6], tzinfo=pytz.UTC)
                     fe.published(published_date)
 
             os.remove("existing_feed.xml")
@@ -89,9 +83,7 @@ class PodcastFeed:
             pass
 
     def list_audio_files(self):
-        response = self.s3_client.list_objects_v2(
-            Bucket=self.r2.bucket_name, Prefix="audio/"
-        )
+        response = self.s3_client.list_objects_v2(Bucket=self.r2.bucket_name, Prefix="audio/")
 
         audio_files = []
         if "Contents" in response:

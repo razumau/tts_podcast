@@ -29,9 +29,7 @@ class HTMLCleaner:
         )
 
     def replace_base64_images(self, new_image_src: str = "#"):
-        self.html = re.sub(
-            BASE64_IMG_PATTERN, f'<img src="{new_image_src}"/>', self.html
-        )
+        self.html = re.sub(BASE64_IMG_PATTERN, f'<img src="{new_image_src}"/>', self.html)
 
     def remove_script(self):
         self.html = re.sub(
@@ -42,14 +40,10 @@ class HTMLCleaner:
         )
 
     def remove_style(self):
-        self.html = re.sub(
-            STYLE_PATTERN, "", self.html, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL
-        )
+        self.html = re.sub(STYLE_PATTERN, "", self.html, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
 
     def remove_meta(self):
-        self.html = re.sub(
-            META_PATTERN, "", self.html, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL
-        )
+        self.html = re.sub(META_PATTERN, "", self.html, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
 
     def remove_comment(self):
         self.html = re.sub(
@@ -60,9 +54,7 @@ class HTMLCleaner:
         )
 
     def remove_link(self):
-        self.html = re.sub(
-            LINK_PATTERN, "", self.html, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL
-        )
+        self.html = re.sub(LINK_PATTERN, "", self.html, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
 
     def clean_html(self):
         self.remove_script()

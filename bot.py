@@ -38,9 +38,7 @@ def allowed_usernames() -> list[str]:
 def is_allowed(user_info) -> bool:
     if os.getenv("ALLOW_ALL_TELEGRAM_USERS") in ("true", "1", "yes"):
         return True
-    return (
-        user_info.id in allowed_user_ids() or user_info.username in allowed_usernames()
-    )
+    return user_info.id in allowed_user_ids() or user_info.username in allowed_usernames()
 
 
 async def set_model(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -74,9 +72,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if len(urls) > 1:
-        await update.message.reply_text(
-            f"Found {len(urls)} URLs, processing them one by one"
-        )
+        await update.message.reply_text(f"Found {len(urls)} URLs, processing them one by one")
 
     for url in urls:
         start_time = time.time()
@@ -87,9 +83,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Produced audio, updating feed")
         add_episode(mp3_filename, title, description=content[:100])
         end_time = time.time()
-        await update.message.reply_text(
-            f"Added “{title}” to the feed. This took {end_time - start_time:.2f} seconds"
-        )
+        await update.message.reply_text(f"Added “{title}” to the feed. This took {end_time - start_time:.2f} seconds")
 
     if len(urls) > 1:
         await update.message.reply_text(f"Processed {len(urls)} URLs")
@@ -99,9 +93,7 @@ def main():
     application = Application.builder().token(os.getenv("TELEGRAM_BOT_TOKEN")).build()
 
     application.add_handler(CommandHandler("start", start))
-    application.add_handler(
-        MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message)
-    )
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
     print("Bot is running...")
     application.run_polling()
