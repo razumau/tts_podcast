@@ -8,13 +8,13 @@ import soundfile as sf
 
 DEFAULT_VOICE = "bf_emma"
 
+
 class KokoroTTS:
-    def __init__(self, text: str, output_filename: str, voice: str = DEFAULT_VOICE, speed: float = 1.0, bitrate: str ="192k"):
+    def __init__(self, text: str, output_filename: str, voice: str = DEFAULT_VOICE, speed: float = 1.0):
         self.text = text
         self.output_filename = output_filename
         self.voice = voice
         self.speed = speed
-        self.bitrate = bitrate
         self.wav_files = []
 
     def text_to_mp3(self):
@@ -49,7 +49,7 @@ class KokoroTTS:
             "-c:a",
             "libmp3lame",
             "-b:a",
-            self.bitrate,
+            "192k",
             self.output_filename,
         ]
 
