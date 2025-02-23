@@ -1,4 +1,9 @@
 from models.kokoro import KokoroTTS
 
-def text_to_mp3(text: str, output_mp3: str, speed: float = 1.0):
-    KokoroTTS(text, output_mp3, speed=speed).text_to_mp3()
+MODELS = {
+    "kokoro": KokoroTTS,
+}
+
+
+def text_to_mp3(text: str, output_mp3: str, model_name: str, speed: float = 1.0):
+    MODELS[model_name](text, output_mp3, speed=speed).text_to_mp3()

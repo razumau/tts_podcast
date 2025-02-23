@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 
 from extract_article import extract_webpage_content
 from podcast import add_episode
-from tts import text_to_mp3
+from tts import text_to_mp3, MODELS
 
 load_dotenv()
 
@@ -43,11 +43,28 @@ def is_allowed(user_info) -> bool:
     )
 
 
-async def handle_message(update: Update, _context: ContextTypes.DEFAULT_TYPE):
+async def set_model(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
     if not is_allowed(user):
         print(f"User {user} is not allowed")
         return
+
+    if len(context.args) != 1 or context.args[0] not in MODELS.keys():
+        await update.message.reply_text(f"Usage: /setmodel <model>\nAvailable models: {', '.join(MODELS.keys())}")
+        return
+
+    model = context.args[0]
+    context.user_data["model"] = model
+    await update.message.reply_text(f"Model set to {model}")
+
+
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.message.from_user
+    if not is_allowed(user):
+        print(f"User {user} is not allowed")
+        return
+
+    model = context.user_data.get("model", "kokoro")
 
     url_pattern = r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
     urls = re.findall(url_pattern, update.message.text)
@@ -66,7 +83,7 @@ async def handle_message(update: Update, _context: ContextTypes.DEFAULT_TYPE):
         title, content = extract_webpage_content(url)
         mp3_filename = title.replace(" ", "_").lower() + ".mp3"
         await update.message.reply_text("Extracted content, producing audio")
-        text_to_mp3(content, mp3_filename, speed=1.0)
+        text_to_mp3(text=content, output_mp3=mp3_filename, model_name=model, speed=1.0)
         await update.message.reply_text("Produced audio, updating feed")
         add_episode(mp3_filename, title, description=content[:100])
         end_time = time.time()

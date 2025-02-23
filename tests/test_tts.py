@@ -15,7 +15,7 @@ class TestTTS(unittest.TestCase):
 
     def test_tts(self):
         test_text = "This text will be read out loud."
-        text_to_mp3(test_text, MP3_FILE, speed=1.0)
+        text_to_mp3(text=test_text, output_mp3=MP3_FILE, model_name="kokoro", speed=1.0)
         self.assertTrue(os.path.exists(MP3_FILE), "MP3 file was not created")
 
         wav_files = glob.glob("*.wav")
