@@ -172,3 +172,4 @@ def add_episode(audio_file, title, description=None):
 
     feed.add_episode(audio_file, title, description)
     feed.regenerate_feed()
+    os.remove(audio_file)
