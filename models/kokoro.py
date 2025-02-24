@@ -6,14 +6,24 @@ import random
 from kokoro import KPipeline
 import soundfile as sf
 
-DEFAULT_VOICE = "bf_emma"
+GOOD_VOICES = ["bf_emma", "af_bella", "af_nicole"]
 
 
 class KokoroTTS:
-    def __init__(self, text: str, output_filename: str, voice: str = DEFAULT_VOICE, speed: float = 1.0):
+    def __init__(
+        self,
+        text: str,
+        output_filename: str,
+        pick_random_voice: bool = False,
+        voice: str = GOOD_VOICES[0],
+        speed: float = 1.0,
+    ):
         self.text = text
         self.output_filename = output_filename
-        self.voice = voice
+        if pick_random_voice:
+            self.voice = random.choice(GOOD_VOICES)
+        else:
+            self.voice = voice
         self.speed = speed
         self.wav_files = []
 

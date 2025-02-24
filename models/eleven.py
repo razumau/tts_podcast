@@ -1,16 +1,28 @@
 import os
+import random
+
 from elevenlabs import VoiceSettings
 from elevenlabs.client import ElevenLabs
 
-DEFAULT_VOICE = "Xb7hH8MSUJpSbSDYk0k2"
+GOOD_VOICES = ["Xb7hH8MSUJpSbSDYk0k2", "XB0fDUnXU5powFXDhCwa", "onwK4e9ZLuTAKqWW03F9", "ThT5KcBeYPX3keUQqHPh"]
 
 
 class ElevenLabsTTS:
-    def __init__(self, text: str, output_filename: str, voice: str = DEFAULT_VOICE, _speed: float = 1.0):
+    def __init__(
+        self,
+        text: str,
+        output_filename: str,
+        pick_random_voice: bool = False,
+        voice: str = GOOD_VOICES[0],
+        _speed: float = 1.0,
+    ):
         self.text = text
         self.output_filename = output_filename
-        self.voice = voice
-        self.model_id = "eleven_turbo_v2_5"
+        if pick_random_voice:
+            self.voice = random.choice(GOOD_VOICES)
+        else:
+            self.voice = voice
+        self.model_id = "eleven_flash_v2_5"
         self.client = ElevenLabs(api_key=os.getenv("ELEVENLABS_API_KEY"))
 
     def text_to_mp3(self):
