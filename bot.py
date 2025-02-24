@@ -62,7 +62,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         print(f"User {user} is not allowed")
         return
 
-    model = context.user_data.get("model", "kokoro")
+    model = context.user_data.get("model", MODELS.keys()[0])
 
     url_pattern = r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
     urls = re.findall(url_pattern, update.message.text)
@@ -93,6 +93,7 @@ def main():
     application = Application.builder().token(os.getenv("TELEGRAM_BOT_TOKEN")).build()
 
     application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("setmodel", set_model))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
     print("Bot is running...")
