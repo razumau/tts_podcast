@@ -541,7 +541,7 @@ wheels = [
 
 [[package]]
 name = "kokoro"
-version = "0.7.12"
+version = "0.7.16"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "huggingface-hub" },
@@ -552,9 +552,9 @@ dependencies = [
     { name = "torch" },
     { name = "transformers" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1e/35/e5d3e06d9f8b05e4bc64884975b9cb53e1395c9824921159f22983b252bf/kokoro-0.7.12.tar.gz", hash = "sha256:795725f0a37213e16427336e0b18ffdea11311bbb743a6c9610309c3fd9fb0ab", size = 24804 }
+sdist = { url = "https://files.pythonhosted.org/packages/22/71/337f2a466396fb1534c19fd36faabf597204b6d4c22ee01afcab14ca0ac3/kokoro-0.7.16.tar.gz", hash = "sha256:c1cf957cfff76cbb6702f16a3cd15eea2a30c561f2c3b6b42107e39e6456316e", size = 24878 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ef/66/9b74967d298c8f11e8606f5a7091e3d7e77ec0d796edf26a95ca4d8f1484/kokoro-0.7.12-py3-none-any.whl", hash = "sha256:89f7596e3d4c5321e84ef10b76a1cd2072cc70874889b95a31282d01c1c6e643", size = 25604 },
+    { url = "https://files.pythonhosted.org/packages/37/28/3b2e2f2d359005e2b3f75920d80790bcdac60a8777a8fd9e1957d50a49e6/kokoro-0.7.16-py3-none-any.whl", hash = "sha256:27d8e8cfd6ec4fdad5caacb5e3fabd7b2576b778226c8cd0f92e1c33ff14f553", size = 25707 },
 ]
 
 [[package]]
@@ -727,14 +727,14 @@ wheels = [
 
 [[package]]
 name = "misaki"
-version = "0.7.12"
+version = "0.7.17"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "regex" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1d/90/9189d7174956378327c6f6ae24361b097464be8fba00c2e58c1140b4fdf2/misaki-0.7.12.tar.gz", hash = "sha256:cfe714488012ab6beaad08077ce782559f9f0e019989df8bfa3ebc7674f7c33f", size = 3662959 }
+sdist = { url = "https://files.pythonhosted.org/packages/0c/f4/fccf89486f15d8963679b2a2bb651ca964530158817518498ad09aa2e452/misaki-0.7.17.tar.gz", hash = "sha256:301ea5ee3bd6dfcf5539bbd55c928a1855cf1bf6a90a367362072348a0e4a16a", size = 3663816 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/59/2f/3982a64074c6a78ceefbe1b5997a459978fbe7d48777d9c2cecd24686ec5/misaki-0.7.12-py3-none-any.whl", hash = "sha256:bb71a0e85ff70557d96303560ac72ccf669a02fb126b3e0b38eed3215bb80b34", size = 3516655 },
+    { url = "https://files.pythonhosted.org/packages/69/63/ff088c8dfddf2cd68b5248405b6865d571b6aa2192caf765d19602eea279/misaki-0.7.17-py3-none-any.whl", hash = "sha256:5c739a540e715c368f9dbcf3e99f814575853785d5ba0096956acabcf58be0cd", size = 3517392 },
 ]
 
 [package.optional-dependencies]
@@ -1693,7 +1693,7 @@ requires-dist = [
     { name = "elevenlabs", specifier = ">=1.51.0" },
     { name = "feedgen", specifier = ">=1.0.0" },
     { name = "feedparser", specifier = ">=6.0.11" },
-    { name = "kokoro", specifier = ">=0.7.12" },
+    { name = "kokoro", specifier = "==0.7.16" },
     { name = "python-dotenv", specifier = ">=1.0.1" },
     { name = "python-telegram-bot", specifier = ">=21.10" },
     { name = "pytz", specifier = ">=2025.1" },
