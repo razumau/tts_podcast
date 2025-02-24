@@ -14,7 +14,7 @@ class ElevenLabsTTS:
         output_filename: str,
         pick_random_voice: bool = False,
         voice: str = GOOD_VOICES[0],
-        _speed: float = 1.0,
+        speed: float = 1.0,
     ):
         self.text = text
         self.output_filename = output_filename
