@@ -6,10 +6,12 @@ import random
 from kokoro import KPipeline
 import soundfile as sf
 
+from models.base import BaseTTS
+
 GOOD_VOICES = ["bf_emma", "af_bella", "af_nicole"]
 
 
-class KokoroTTS:
+class KokoroTTS(BaseTTS):
     def __init__(
         self,
         text: str,

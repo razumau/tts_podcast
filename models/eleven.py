@@ -4,10 +4,12 @@ import random
 from elevenlabs import VoiceSettings
 from elevenlabs.client import ElevenLabs
 
+from models.base import BaseTTS
+
 GOOD_VOICES = ["Xb7hH8MSUJpSbSDYk0k2", "XB0fDUnXU5powFXDhCwa", "onwK4e9ZLuTAKqWW03F9", "ThT5KcBeYPX3keUQqHPh"]
 
 
-class ElevenLabsTTS:
+class ElevenLabsTTS(BaseTTS):
     def __init__(
         self,
         text: str,
