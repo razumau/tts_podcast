@@ -6,7 +6,7 @@ import random
 from kokoro import KPipeline
 import soundfile as sf
 
-from models.base import BaseTTS
+from models.base import BaseTTS, TTSMetadata
 
 GOOD_VOICES = ["bf_emma", "af_bella", "af_nicole"]
 
@@ -29,9 +29,10 @@ class KokoroTTS(BaseTTS):
         self.speed = speed
         self.wav_files = []
 
-    def text_to_mp3(self):
+    def text_to_mp3(self) -> TTSMetadata:
         self.output_tts_to_wav_files()
         self.concat_wav_to_mp3()
+        return TTSMetadata(model="kokoro", voice=self.voice)
 
     def output_tts_to_wav_files(self):
         random_prefix = "".join(random.choices(string.ascii_lowercase, k=15))

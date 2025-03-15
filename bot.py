@@ -80,9 +80,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         title, content = extract_webpage_content(url)
         mp3_filename = title.replace(" ", "_").lower() + ".mp3"
         await update.message.reply_text("Extracted content, producing audio")
-        text_to_mp3(text=content, output_mp3=mp3_filename, model_name=model_name, speed=1.0)
+        metadata = text_to_mp3(text=content, output_mp3=mp3_filename, model_name=model_name, speed=1.0)
         await update.message.reply_text("Produced audio, updating feed")
-        add_episode(mp3_filename, title, description=content[:100])
+        description = f"Model: {metadata.model}. Voice: {metadata.voice}. {content[:150]}"
+        add_episode(mp3_filename, title, description=description)
         end_time = time.time()
         await update.message.reply_text(f"Added “{title}” to the feed. This took {end_time - start_time:.2f} seconds")
 

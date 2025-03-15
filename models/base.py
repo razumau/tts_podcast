@@ -1,4 +1,11 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
+
+
+@dataclass
+class TTSMetadata:
+    model: str
+    voice: str
 
 class BaseTTS(ABC):
     @abstractmethod
@@ -13,5 +20,5 @@ class BaseTTS(ABC):
         pass
 
     @abstractmethod
-    def text_to_mp3(self):
+    def text_to_mp3(self) -> TTSMetadata:
         pass

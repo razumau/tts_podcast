@@ -4,7 +4,7 @@ import random
 from elevenlabs import VoiceSettings
 from elevenlabs.client import ElevenLabs
 
-from models.base import BaseTTS
+from models.base import BaseTTS, TTSMetadata
 
 GOOD_VOICES = ["Xb7hH8MSUJpSbSDYk0k2", "XB0fDUnXU5powFXDhCwa", "onwK4e9ZLuTAKqWW03F9", "ThT5KcBeYPX3keUQqHPh"]
 
@@ -27,7 +27,7 @@ class ElevenLabsTTS(BaseTTS):
         self.model_id = "eleven_flash_v2_5"
         self.client = ElevenLabs(api_key=os.getenv("ELEVENLABS_API_KEY"))
 
-    def text_to_mp3(self):
+    def text_to_mp3(self) -> TTSMetadata:
         response = self.client.text_to_speech.convert(
             voice_id=self.voice,
             output_format="mp3_22050_32",
@@ -45,3 +45,5 @@ class ElevenLabsTTS(BaseTTS):
             for chunk in response:
                 if chunk:
                     f.write(chunk)
+
+        return TTSMetadata(model="eleven", voice=self.voice)
