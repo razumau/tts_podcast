@@ -8,7 +8,7 @@ import soundfile as sf
 
 from models.base import BaseTTS, TTSMetadata
 
-GOOD_VOICES = ["bf_emma", "af_bella"]
+GOOD_VOICES = ["bf_emma", "af_bella", "bf_isabella", "af_heart"]
 
 
 class KokoroTTS(BaseTTS):
