@@ -26,3 +26,7 @@ def extract_webpage_content(url: str) -> tuple[str, str] or None:
     except subprocess.CalledProcessError as e:
         print(f"Error running script: {e}")
         return None
+
+if __name__ == "__main__":
+    url = "https://worksinprogress.co/issue/chinese-towers-and-american-blocks"
+    subprocess.run(["bun", BUN_SCRIPT, url], check=True)
