@@ -3,8 +3,8 @@ const { JSDOM } = require('jsdom');
 const fs = require('fs');
 
 const url = process.argv[2];
-const ARTICLE_FILE = 'extracted_article.txt';
-const ARTICLE_TITLE_FILE = 'extracted_article_title.txt';
+const ARTICLE_FILE = process.argv[3] || 'extracted_article.txt';
+const ARTICLE_TITLE_FILE = process.argv[4] || 'extracted_article_title.txt';
 
 if (!url) {
     console.error('Provide a URL or local file path as an argument');

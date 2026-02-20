@@ -14,10 +14,21 @@ import re
 from dotenv import load_dotenv
 
 from extract_article import extract_webpage_content
+from preprocess import preprocess_for_tts
+from llm_preprocess import rewrite_for_audio
+from llm_dialogue import generate_dialogue_script
 from podcast import add_episode
 from tts import text_to_mp3, MODELS
 
 load_dotenv()
+
+PREPROCESS_MODES = {
+    "none": "No preprocessing (raw text)",
+    "regex": "Regex-based cleaning (remove URLs, code, citations, expand numbers)",
+    "llm": "LLM rewrite for natural audio narration",
+    "dialogue": "LLM-generated two-speaker dialogue (use with dia model)",
+}
+DEFAULT_PREPROCESS = "regex"
 
 
 async def start(update: Update, _context: ContextTypes.DEFAULT_TYPE):
@@ -56,6 +67,34 @@ async def set_model(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(f"Model set to {model}")
 
 
+async def set_preprocess(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.message.from_user
+    if not is_allowed(user):
+        print(f"User {user} is not allowed")
+        return
+
+    if len(context.args) != 1 or context.args[0] not in PREPROCESS_MODES:
+        modes_list = "\n".join(f"  {k}: {v}" for k, v in PREPROCESS_MODES.items())
+        await update.message.reply_text(f"Usage: /setpreprocess <mode>\nAvailable modes:\n{modes_list}")
+        return
+
+    mode = context.args[0]
+    context.user_data["preprocess"] = mode
+    await update.message.reply_text(f"Preprocessing set to: {mode} — {PREPROCESS_MODES[mode]}")
+
+
+def apply_preprocessing(content: str, mode: str) -> str:
+    if mode == "none":
+        return content
+    elif mode == "regex":
+        return preprocess_for_tts(content)
+    elif mode == "llm":
+        return rewrite_for_audio(preprocess_for_tts(content))
+    elif mode == "dialogue":
+        return generate_dialogue_script(preprocess_for_tts(content))
+    return content
+
+
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
     if not is_allowed(user):
@@ -64,6 +103,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     default_model_name = next(iter(MODELS.keys()))
     model_name = context.user_data.get("model", default_model_name)
+    preprocess_mode = context.user_data.get("preprocess", DEFAULT_PREPROCESS)
 
     url_pattern = r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
     urls = re.findall(url_pattern, update.message.text)
@@ -77,15 +117,26 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     for url in urls:
         start_time = time.time()
-        title, content = extract_webpage_content(url)
+        result = extract_webpage_content(url)
+        if result is None:
+            await update.message.reply_text(f"Failed to extract content from {url}")
+            continue
+
+        title, content = result
         mp3_filename = title.replace(" ", "_").lower() + ".mp3"
-        await update.message.reply_text("Extracted content, producing audio")
+
+        await update.message.reply_text(f"Extracted content, preprocessing ({preprocess_mode})...")
+        content = apply_preprocessing(content, preprocess_mode)
+
+        await update.message.reply_text("Producing audio...")
         metadata = text_to_mp3(text=content, output_mp3=mp3_filename, model_name=model_name, speed=1.0)
         await update.message.reply_text("Produced audio, updating feed")
-        description = f"Model: {metadata.model}. Voice: {metadata.voice}. {content[:150]}"
+        description = f"Model: {metadata.model}. Voice: {metadata.voice}. Preprocess: {preprocess_mode}. {content[:150]}"
         add_episode(mp3_filename, title, description=description)
         end_time = time.time()
-        await update.message.reply_text(f"Added “{title}” to the feed. This took {end_time - start_time:.2f} seconds")
+        await update.message.reply_text(
+            f"Added \u201c{title}\u201d to the feed. This took {end_time - start_time:.2f} seconds"
+        )
 
     if len(urls) > 1:
         await update.message.reply_text(f"Processed {len(urls)} URLs")
@@ -96,6 +147,7 @@ def main():
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("setmodel", set_model))
+    application.add_handler(CommandHandler("setpreprocess", set_preprocess))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
     print("Bot is running...")

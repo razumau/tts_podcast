@@ -8,15 +8,17 @@ dependencies = [
     "boto3>=1.36.16",
     "feedgen>=1.0.0",
     "feedparser>=6.0.11",
-    "kokoro==0.7.16",
+    "kokoro>=0.9.4",
+    "num2words>=0.5.14",
     "python-dotenv>=1.0.1",
     "python-telegram-bot>=21.10",
     "pytz>=2025.1",
     "soundfile>=0.13.1",
     "transformers>=4.48.3",
-    "spacy<=3.7.3",
     "ruff>=0.9.7",
     "elevenlabs>=1.51.0",
+    "anthropic>=0.40.0",
+    "dia @ git+https://github.com/nari-labs/dia.git",
 ]
 
 [tool.ruff]
