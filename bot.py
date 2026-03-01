@@ -24,7 +24,7 @@ load_dotenv()
 PREPROCESS_MODES = {
     "none": "No preprocessing (raw text)",
     "regex": "Regex-based cleaning (remove URLs, code, citations, expand numbers)",
-    "llm": "LLM rewrite for natural audio narration"
+    "llm": "LLM rewrite for natural audio narration",
 }
 DEFAULT_PREPROCESS = "regex"
 
@@ -81,13 +81,13 @@ async def set_preprocess(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(f"Preprocessing set to: {mode} — {PREPROCESS_MODES[mode]}")
 
 
-def apply_preprocessing(content: str, mode: str) -> str:
+async def apply_preprocessing(content: str, mode: str) -> str:
     if mode == "none":
         return content
     elif mode == "regex":
         return preprocess_for_tts(content)
     elif mode == "llm":
-        return rewrite_for_audio(preprocess_for_tts(content))
+        return await rewrite_for_audio(preprocess_for_tts(content))
     return content
 
 
@@ -122,12 +122,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         mp3_filename = title.replace(" ", "_").lower() + ".mp3"
 
         await update.message.reply_text(f"Extracted content, preprocessing ({preprocess_mode})...")
-        content = apply_preprocessing(content, preprocess_mode)
+        content = await apply_preprocessing(content, preprocess_mode)
 
         await update.message.reply_text("Producing audio...")
         metadata = text_to_mp3(text=content, output_mp3=mp3_filename, model_name=model_name, speed=1.0)
         await update.message.reply_text("Produced audio, updating feed")
-        description = f"Model: {metadata.model}. Voice: {metadata.voice}. Preprocess: {preprocess_mode}. {content[:150]}"
+        description = (
+            f"Model: {metadata.model}. Voice: {metadata.voice}. Preprocess: {preprocess_mode}. {content[:150]}"
+        )
         add_episode(mp3_filename, title, description=description)
         end_time = time.time()
         await update.message.reply_text(

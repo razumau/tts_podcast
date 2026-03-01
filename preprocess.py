@@ -20,7 +20,7 @@ ABBREVIATIONS = {
 TITLE_ABBREVIATIONS = {
     "Dr.": "Doctor",
     "Mr.": "Mister",
-    "Mrs.": "Misses",
+    "Mrs.": "Missus",
     "Ms.": "Ms",
     "Prof.": "Professor",
     "Sr.": "Senior",

@@ -7,6 +7,7 @@ class TTSMetadata:
     model: str
     voice: str
 
+
 class BaseTTS(ABC):
     @abstractmethod
     def __init__(
