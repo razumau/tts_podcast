@@ -3,13 +3,11 @@ from functools import partial
 from models.base import TTSMetadata
 from models.eleven import ElevenLabsTTS
 from models.kokoro import KokoroTTS
-from models.dia_tts import DiaTTS
 
 MODELS = {
     "kokoro": KokoroTTS,
     "eleven": ElevenLabsTTS,
-    "eleven_v3": partial(ElevenLabsTTS, model_id="eleven_v3"),
-    "dia": DiaTTS,
+    "eleven_v3": partial(ElevenLabsTTS, model_id="eleven_v3")
 }
 
 

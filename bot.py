@@ -16,7 +16,6 @@ from dotenv import load_dotenv
 from extract_article import extract_webpage_content
 from preprocess import preprocess_for_tts
 from llm_preprocess import rewrite_for_audio
-from llm_dialogue import generate_dialogue_script
 from podcast import add_episode
 from tts import text_to_mp3, MODELS
 
@@ -25,8 +24,7 @@ load_dotenv()
 PREPROCESS_MODES = {
     "none": "No preprocessing (raw text)",
     "regex": "Regex-based cleaning (remove URLs, code, citations, expand numbers)",
-    "llm": "LLM rewrite for natural audio narration",
-    "dialogue": "LLM-generated two-speaker dialogue (use with dia model)",
+    "llm": "LLM rewrite for natural audio narration"
 }
 DEFAULT_PREPROCESS = "regex"
 
@@ -90,8 +88,6 @@ def apply_preprocessing(content: str, mode: str) -> str:
         return preprocess_for_tts(content)
     elif mode == "llm":
         return rewrite_for_audio(preprocess_for_tts(content))
-    elif mode == "dialogue":
-        return generate_dialogue_script(preprocess_for_tts(content))
     return content
 
 
