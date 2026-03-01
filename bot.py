@@ -13,6 +13,7 @@ import re
 
 from dotenv import load_dotenv
 
+from cleanup import cleanup
 from extract_article import extract_webpage_content
 from podcast import add_episode
 from tts import text_to_mp3, MODELS
@@ -79,13 +80,15 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         start_time = time.time()
         title, content = extract_webpage_content(url)
         mp3_filename = title.replace(" ", "_").lower() + ".mp3"
-        await update.message.reply_text("Extracted content, producing audio")
-        metadata = text_to_mp3(text=content, output_mp3=mp3_filename, model_name=model_name, speed=1.0)
-        await update.message.reply_text("Produced audio, updating feed")
-        description = f"Model: {metadata.model}. Voice: {metadata.voice}. {content[:150]}"
-        add_episode(mp3_filename, title, description=description)
-        end_time = time.time()
-        await update.message.reply_text(f"Added “{title}” to the feed. This took {end_time - start_time:.2f} seconds")
+        await update.message.reply_text("Extracted content, cleaning up the text")
+        text = cleanup(content)
+        await update.message.reply_text("Text cleaned up, producing audio")
+        # metadata = text_to_mp3(text=text, output_mp3=mp3_filename, model_name=model_name, speed=1.0)
+        # await update.message.reply_text("Produced audio, updating feed")
+        # description = f"Model: {metadata.model}. Voice: {metadata.voice}. {content[:150]}"
+        # add_episode(mp3_filename, title, description=description)
+        # end_time = time.time()
+        # await update.message.reply_text(f"Added “{title}” to the feed. This took {end_time - start_time:.2f} seconds")
 
     if len(urls) > 1:
         await update.message.reply_text(f"Processed {len(urls)} URLs")
