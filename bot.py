@@ -26,7 +26,7 @@ PREPROCESS_MODES = {
     "regex": "Regex-based cleaning (remove URLs, code, citations, expand numbers)",
     "llm": "LLM rewrite for natural audio narration",
 }
-DEFAULT_PREPROCESS = "regex"
+DEFAULT_PREPROCESS = "llm"
 
 
 async def start(update: Update, _context: ContextTypes.DEFAULT_TYPE):
@@ -119,10 +119,23 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             continue
 
         title, content = result
-        mp3_filename = title.replace(" ", "_").lower() + ".mp3"
+        base_name = title.replace(" ", "_").lower()
+        mp3_filename = base_name + ".mp3"
 
-        await update.message.reply_text(f"Extracted content, preprocessing ({preprocess_mode})...")
-        content = await apply_preprocessing(content, preprocess_mode)
+        os.makedirs("texts", exist_ok=True)
+        with open(os.path.join("texts", base_name + ".raw.txt"), "w") as f:
+            f.write(content)
+
+        preprocessed_path = os.path.join("texts", base_name + f".{preprocess_mode}.txt")
+        if os.path.exists(preprocessed_path):
+            with open(preprocessed_path) as f:
+                content = f.read()
+            await update.message.reply_text(f"Using cached {preprocess_mode}-preprocessed text")
+        else:
+            await update.message.reply_text(f"Extracted content, preprocessing ({preprocess_mode})...")
+            content = await apply_preprocessing(content, preprocess_mode)
+            with open(preprocessed_path, "w") as f:
+                f.write(content)
 
         await update.message.reply_text("Producing audio...")
         metadata = text_to_mp3(text=content, output_mp3=mp3_filename, model_name=model_name, speed=1.0)

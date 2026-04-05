@@ -31,16 +31,17 @@ async def rewrite_for_audio(text: str) -> str:
 
     client = anthropic.AsyncAnthropic(api_key=api_key)
 
-    message = await client.messages.create(
+    async with client.messages.stream(
         model="claude-haiku-4-5-20251001",
-        max_tokens=65536,
+        max_tokens=64000,
         system=SYSTEM_PROMPT,
         messages=[
             {"role": "user", "content": REWRITE_PROMPT.format(text=text)},
         ],
-    )
+    ) as stream:
+        result = await stream.get_final_message()
 
-    if message.stop_reason == "max_tokens":
+    if result.stop_reason == "max_tokens":
         print("Warning: LLM preprocessing output was truncated due to max_tokens limit")
 
-    return message.content[0].text
+    return result.content[0].text
