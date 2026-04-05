@@ -22,6 +22,7 @@ GOOD_VOICES = [
     "bf_lily",
     "bm_daniel",
     "bm_george",
+    "bm_fable",
 ]
 
 
