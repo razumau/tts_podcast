@@ -17,3 +17,4 @@ node_modules
 *.wav
 feed.xml
 .env
+/texts
