@@ -17,7 +17,7 @@ REWRITE_PROMPT = """Update the following article for audio narration. Follow the
 8. Remove all markdown formatting (headers, bold, italic, links).
 9. Keep the content faithful to the original — do not add or rewrite anything that isn’t covered by the rules above.
 10. Output ONLY the rewritten text, nothing else.
-
+11. Add correct pronunciation for uncommon non-English names using this format: [Medici](/mˈɛdɪtʃi/)
 Article text:
 
 {text}"""
