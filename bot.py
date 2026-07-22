@@ -1,9 +1,10 @@
 import os
 import time
 
-from telegram import Update
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application,
+    CallbackQueryHandler,
     CommandHandler,
     MessageHandler,
     filters,
@@ -50,35 +51,89 @@ def is_allowed(user_info) -> bool:
     return user_info.id in allowed_user_ids() or user_info.username in allowed_usernames()
 
 
-async def set_model(update: Update, context: ContextTypes.DEFAULT_TYPE):
+MODEL_CALLBACK_PREFIX = "model:"
+
+
+async def choose_model(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
     if not is_allowed(user):
         print(f"User {user} is not allowed")
         return
 
-    if len(context.args) != 1 or context.args[0] not in MODELS.keys():
-        await update.message.reply_text(f"Usage: /setmodel <model>\nAvailable models: {', '.join(MODELS.keys())}")
+    current = context.user_data.get("model", next(iter(MODELS.keys())))
+    keyboard = [
+        [
+            InlineKeyboardButton(
+                f"✓ {name}" if name == current else name,
+                callback_data=f"{MODEL_CALLBACK_PREFIX}{name}",
+            )
+        ]
+        for name in MODELS.keys()
+    ]
+    await update.message.reply_text(
+        f"Current model: {current}\nSelect a model:",
+        reply_markup=InlineKeyboardMarkup(keyboard),
+    )
+
+
+async def model_selected(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    if not is_allowed(query.from_user):
+        print(f"User {query.from_user} is not allowed")
+        await query.answer()
         return
 
-    model = context.args[0]
+    model = query.data[len(MODEL_CALLBACK_PREFIX) :]
+    if model not in MODELS:
+        await query.answer("Unknown model")
+        return
+
     context.user_data["model"] = model
-    await update.message.reply_text(f"Model set to {model}")
+    await query.answer(f"Model set to {model}")
+    await query.edit_message_text(f"Model set to {model}")
 
 
-async def set_preprocess(update: Update, context: ContextTypes.DEFAULT_TYPE):
+PREPROCESS_CALLBACK_PREFIX = "preprocess:"
+
+
+async def choose_preprocess(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
     if not is_allowed(user):
         print(f"User {user} is not allowed")
         return
 
-    if len(context.args) != 1 or context.args[0] not in PREPROCESS_MODES:
-        modes_list = "\n".join(f"  {k}: {v}" for k, v in PREPROCESS_MODES.items())
-        await update.message.reply_text(f"Usage: /setpreprocess <mode>\nAvailable modes:\n{modes_list}")
+    current = context.user_data.get("preprocess", DEFAULT_PREPROCESS)
+    keyboard = [
+        [
+            InlineKeyboardButton(
+                f"✓ {name}" if name == current else name,
+                callback_data=f"{PREPROCESS_CALLBACK_PREFIX}{name}",
+            )
+        ]
+        for name in PREPROCESS_MODES.keys()
+    ]
+    modes_list = "\n".join(f"  {k}: {v}" for k, v in PREPROCESS_MODES.items())
+    await update.message.reply_text(
+        f"Current mode: {current}\nSelect a preprocessing mode:\n{modes_list}",
+        reply_markup=InlineKeyboardMarkup(keyboard),
+    )
+
+
+async def preprocess_selected(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    if not is_allowed(query.from_user):
+        print(f"User {query.from_user} is not allowed")
+        await query.answer()
         return
 
-    mode = context.args[0]
+    mode = query.data[len(PREPROCESS_CALLBACK_PREFIX) :]
+    if mode not in PREPROCESS_MODES:
+        await query.answer("Unknown mode")
+        return
+
     context.user_data["preprocess"] = mode
-    await update.message.reply_text(f"Preprocessing set to: {mode} — {PREPROCESS_MODES[mode]}")
+    await query.answer(f"Preprocessing set to {mode}")
+    await query.edit_message_text(f"Preprocessing set to: {mode} — {PREPROCESS_MODES[mode]}")
 
 
 async def apply_preprocessing(content: str, mode: str) -> str:
@@ -157,8 +212,10 @@ def main():
     application = Application.builder().token(os.getenv("TELEGRAM_BOT_TOKEN")).build()
 
     application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("setmodel", set_model))
-    application.add_handler(CommandHandler("setpreprocess", set_preprocess))
+    application.add_handler(CommandHandler("model", choose_model))
+    application.add_handler(CallbackQueryHandler(model_selected, pattern=f"^{MODEL_CALLBACK_PREFIX}"))
+    application.add_handler(CommandHandler("preprocess", choose_preprocess))
+    application.add_handler(CallbackQueryHandler(preprocess_selected, pattern=f"^{PREPROCESS_CALLBACK_PREFIX}"))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
     print("Bot is running...")
