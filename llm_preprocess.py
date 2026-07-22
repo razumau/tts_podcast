@@ -17,7 +17,7 @@ REWRITE_PROMPT = """Update the following article for audio narration. Follow the
 8. Remove all markdown formatting (headers, bold, italic, links).
 9. Keep the content faithful to the original — do not add or rewrite anything that isn’t covered by the rules above.
 10. Output ONLY the rewritten text, nothing else.
-11. Add correct pronunciation for uncommon non-English names using this format: [Medici](/mˈɛdɪtʃi/)
+11. Add correct pronunciation for uncommon non-English names using this format, similar to Markdown links: [Medici](/mˈɛdɪtʃi/). 
 Article text:
 
 {text}"""
@@ -32,7 +32,7 @@ async def rewrite_for_audio(text: str) -> str:
     client = anthropic.AsyncAnthropic(api_key=api_key)
 
     async with client.messages.stream(
-        model="claude-haiku-4-5-20251001",
+        model="claude-sonnet-4-6",
         max_tokens=64000,
         system=SYSTEM_PROMPT,
         messages=[
