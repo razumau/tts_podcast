@@ -1,5 +1,5 @@
-import subprocess
 import os
+import subprocess
 import tempfile
 
 BUN_SCRIPT = "extract_article.ts"

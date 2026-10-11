@@ -1,6 +1,7 @@
+import glob
 import os
 import unittest
-import glob
+
 from tts import text_to_mp3
 
 MP3_FILE = "test.mp3"

@@ -5,22 +5,27 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "boto3>=1.36.16",
+    "boto3>=1.43.111",
     "feedgen>=1.0.0",
-    "feedparser>=6.0.11",
+    "feedparser>=6.0.14",
     "kokoro>=0.9.4",
     "num2words>=0.5.14",
-    "python-dotenv>=1.0.1",
-    "python-telegram-bot>=21.10",
-    "pytz>=2025.1",
-    "soundfile>=0.13.1",
-    "transformers>=4.48.3",
-    "ruff>=0.9.7",
-    "elevenlabs>=1.51.0",
-    "anthropic>=0.40.0",
+    "python-dotenv>=1.2.4",
+    "python-telegram-bot>=22.8",
+    "pytz>=2026.5",
+    "soundfile>=0.14.0",
+    "transformers>=5.19.0",
+    "ruff>=0.17.0",
+    "elevenlabs>=2.71.0",
+    "anthropic>=1.13.0",
     "en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0.tar.gz",
-    "spacy>=3.8.0",
+    "spacy>=3.8.16",
 ]
 
 [tool.ruff]
 line-length = 120
+
+[tool.ruff.lint]
+# ASYNC230: handlers already run extraction and TTS synchronously, small text-file writes don't matter.
+# SIM115: kokoro's ffmpeg concat list is a delete=False temp file, closed and removed by hand.
+ignore = ["ASYNC230", "SIM115"]

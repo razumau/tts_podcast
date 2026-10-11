@@ -31,9 +31,14 @@ async def rewrite_for_audio(text: str) -> str:
 
     client = anthropic.AsyncAnthropic(api_key=api_key)
 
-    async with client.messages.stream(
-        model="claude-sonnet-4-6",
+    async with client.beta.messages.stream(
+        model="claude-sonnet-5-5",
         max_tokens=64000,
+        # Mechanical rewrite: low effort keeps thinking short; Sonnet 5.5 defaults to high
+        output_config={"effort": "low"},
+        # Retry cyber-category refusals (e.g. security articles) on another model server-side
+        betas=["server-side-fallback-2026-07-01"],
+        fallbacks="default",
         system=SYSTEM_PROMPT,
         messages=[
             {"role": "user", "content": REWRITE_PROMPT.format(text=text)},
@@ -41,7 +46,12 @@ async def rewrite_for_audio(text: str) -> str:
     ) as stream:
         result = await stream.get_final_message()
 
+    if result.stop_reason == "refusal":
+        print(f"Warning: LLM preprocessing was declined ({result.stop_details}), using input text as is")
+        return text
+
     if result.stop_reason == "max_tokens":
         print("Warning: LLM preprocessing output was truncated due to max_tokens limit")
 
-    return result.content[0].text
+    # Responses may start with a thinking block, so collect text blocks only
+    return "".join(block.text for block in result.content if block.type == "text")

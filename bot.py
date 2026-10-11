@@ -1,24 +1,23 @@
 import os
+import re
 import time
 
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from dotenv import load_dotenv
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import (
     Application,
     CallbackQueryHandler,
     CommandHandler,
+    ContextTypes,
     MessageHandler,
     filters,
-    ContextTypes,
 )
-import re
-
-from dotenv import load_dotenv
 
 from extract_article import extract_webpage_content
-from preprocess import preprocess_for_tts
 from llm_preprocess import rewrite_for_audio
 from podcast import add_episode
-from tts import text_to_mp3, MODELS
+from preprocess import preprocess_for_tts
+from tts import MODELS, text_to_mp3
 
 load_dotenv()
 
@@ -68,7 +67,7 @@ async def choose_model(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 callback_data=f"{MODEL_CALLBACK_PREFIX}{name}",
             )
         ]
-        for name in MODELS.keys()
+        for name in MODELS
     ]
     await update.message.reply_text(
         f"Current model: {current}\nSelect a model:",
@@ -110,7 +109,7 @@ async def choose_preprocess(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 callback_data=f"{PREPROCESS_CALLBACK_PREFIX}{name}",
             )
         ]
-        for name in PREPROCESS_MODES.keys()
+        for name in PREPROCESS_MODES
     ]
     modes_list = "\n".join(f"  {k}: {v}" for k, v in PREPROCESS_MODES.items())
     await update.message.reply_text(

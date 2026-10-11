@@ -1,13 +1,13 @@
 import os
 from dataclasses import dataclass
 from datetime import datetime
+
 import boto3
-from feedgen.feed import FeedGenerator
+import feedparser
 import pytz
 from botocore.exceptions import ClientError
-import feedparser
-
 from dotenv import load_dotenv
+from feedgen.feed import FeedGenerator
 
 load_dotenv()
 
