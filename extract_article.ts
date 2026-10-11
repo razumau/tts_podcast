@@ -17,7 +17,16 @@ async function extractContent(url: string) {
     try {
         let dom: any;
         if (url.startsWith('http')) {
-            dom = await JSDOM.fromURL(url);
+            // Not JSDOM.fromURL: jsdom 27+ fetches through undici's Dispatcher, which Bun's built-in undici lacks
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status} for ${url}`);
+            }
+            // Pass bytes rather than text so that jsdom detects the encoding, like fromURL did
+            dom = new JSDOM(Buffer.from(await response.arrayBuffer()), {
+                url: response.url,
+                contentType: response.headers.get('content-type') ?? 'text/html',
+            });
         } else {
             const fileContent = fs.readFileSync(url, 'utf8');
             dom = new JSDOM(fileContent);
