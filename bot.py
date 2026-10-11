@@ -1,3 +1,4 @@
+import asyncio
 import os
 import re
 import time
@@ -17,7 +18,7 @@ from extract_article import extract_webpage_content
 from llm_preprocess import rewrite_for_audio
 from podcast import add_episode
 from preprocess import preprocess_for_tts
-from tts import MODELS, text_to_mp3
+from tts import MODELS, split_for_model, text_to_mp3
 
 load_dotenv()
 
@@ -27,6 +28,10 @@ PREPROCESS_MODES = {
     "llm": "LLM rewrite for natural audio narration",
 }
 DEFAULT_PREPROCESS = "llm"
+
+# Articles are extracted and preprocessed concurrently, but audio generation and feed updates run one article
+# at a time: Kokoro is CPU-heavy, and each feed update rewrites the whole feed.xml in R2.
+audio_lock = asyncio.Lock()
 
 
 async def start(update: Update, _context: ContextTypes.DEFAULT_TYPE):
@@ -167,14 +172,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     for url in urls:
         start_time = time.time()
-        result = extract_webpage_content(url)
+        result = await asyncio.to_thread(extract_webpage_content, url)
         if result is None:
             await update.message.reply_text(f"Failed to extract content from {url}")
             continue
 
         title, content = result
         base_name = title.replace(" ", "_").lower()
-        mp3_filename = base_name + ".mp3"
 
         os.makedirs("texts", exist_ok=True)
         with open(os.path.join("texts", base_name + ".raw.txt"), "w") as f:
@@ -191,17 +195,41 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             with open(preprocessed_path, "w") as f:
                 f.write(content)
 
-        await update.message.reply_text("Producing audio...")
-        metadata = text_to_mp3(text=content, output_mp3=mp3_filename, model_name=model_name, speed=1.0)
-        await update.message.reply_text("Produced audio, updating feed")
-        description = (
-            f"Model: {metadata.model}. Voice: {metadata.voice}. Preprocess: {preprocess_mode}. {content[:150]}"
-        )
-        add_episode(mp3_filename, title, description=description)
+        parts = split_for_model(content, model_name)
+        if len(parts) > 1:
+            await update.message.reply_text(
+                f"The text is too long for one episode, splitting it into {len(parts)} parts"
+            )
+        if audio_lock.locked():
+            await update.message.reply_text("Waiting for the previous article to finish...")
+
+        async with audio_lock:
+            voice = None
+            for i, part in enumerate(parts, start=1):
+                if len(parts) == 1:
+                    episode_title = title
+                    mp3_filename = base_name + ".mp3"
+                else:
+                    episode_title = f"{title}, part {i} of {len(parts)}"
+                    mp3_filename = f"{base_name}_part{i}.mp3"
+
+                await update.message.reply_text(
+                    "Producing audio..." if len(parts) == 1 else f"Producing audio for part {i} of {len(parts)}..."
+                )
+                # Keep the voice of the first part for the rest
+                metadata = await asyncio.to_thread(
+                    text_to_mp3, text=part, output_mp3=mp3_filename, model_name=model_name, speed=1.0, voice=voice
+                )
+                voice = metadata.voice
+                await update.message.reply_text("Produced audio, updating feed")
+                description = (
+                    f"Model: {metadata.model}. Voice: {metadata.voice}. Preprocess: {preprocess_mode}. {part[:150]}"
+                )
+                await asyncio.to_thread(add_episode, mp3_filename, episode_title, description=description)
+                await update.message.reply_text(f"Added \u201c{episode_title}\u201d to the feed")
+
         end_time = time.time()
-        await update.message.reply_text(
-            f"Added \u201c{title}\u201d to the feed. This took {end_time - start_time:.2f} seconds"
-        )
+        await update.message.reply_text(f"Finished \u201c{title}\u201d in {end_time - start_time:.2f} seconds")
 
     if len(urls) > 1:
         await update.message.reply_text(f"Processed {len(urls)} URLs")
@@ -215,7 +243,8 @@ def main():
     application.add_handler(CallbackQueryHandler(model_selected, pattern=f"^{MODEL_CALLBACK_PREFIX}"))
     application.add_handler(CommandHandler("preprocess", choose_preprocess))
     application.add_handler(CallbackQueryHandler(preprocess_selected, pattern=f"^{PREPROCESS_CALLBACK_PREFIX}"))
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    # block=False: generating audio takes minutes, and other updates (like /model) shouldn't wait for it
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message, block=False))
 
     print("Bot is running...")
     application.run_polling()

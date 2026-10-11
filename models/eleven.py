@@ -11,6 +11,7 @@ GOOD_VOICES = ["Xb7hH8MSUJpSbSDYk0k2", "XB0fDUnXU5powFXDhCwa", "onwK4e9ZLuTAKqWW
 AVAILABLE_MODELS = {
     "eleven": "eleven_flash_v2_5",
     "eleven_v3": "eleven_v3",
+    "eleven_v4": "eleven_v4",
 }
 
 

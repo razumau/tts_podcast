@@ -44,9 +44,12 @@ Ruff line-length is 120 (configured in `pyproject.toml`).
 3. **`tts.py`** → delegates to a TTS model from `models/`:
    - `models/base.py` — `BaseTTS` abstract class and `TTSMetadata` dataclass
    - `models/kokoro.py` — local Kokoro-82M TTS (13 voices, 24kHz WAV, concatenated to MP3)
-   - `models/eleven.py` — ElevenLabs API (Flash v2.5 and v3 model variants)
+   - `models/eleven.py` — ElevenLabs API (Flash v2.5, v3 and v4 model variants)
    - `MODELS` dict in `tts.py` maps model names to classes
+   - Texts longer than `MAX_CHARS_PER_EPISODE` (per model, in `tts.py`; for ElevenLabs it's the API's per-request limit) are split by `chunking.py` at paragraph/sentence boundaries into balanced parts, published as separate episodes "<title>, part N of M"
 4. **`podcast.py`** → `PodcastFeed` uploads MP3 to Cloudflare R2, generates/updates RSS feed with iTunes podcast extensions
+
+**Concurrency:** `handle_message` runs with `block=False` and moves blocking work to threads, so the bot stays responsive; an `asyncio.Lock` makes audio generation and feed updates run one article at a time.
 
 **Telegram bot commands** (`bot.py`): `/start`, `/setmodel <model>`, `/setpreprocess <mode>`. Text messages with URLs trigger the pipeline. Access controlled by username/ID whitelist in env vars.
 

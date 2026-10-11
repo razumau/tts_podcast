@@ -26,6 +26,6 @@ dependencies = [
 line-length = 120
 
 [tool.ruff.lint]
-# ASYNC230: handlers already run extraction and TTS synchronously, small text-file writes don't matter.
+# ASYNC230: the bot's handlers write small cached text files, blocking on those doesn't matter.
 # SIM115: kokoro's ffmpeg concat list is a delete=False temp file, closed and removed by hand.
 ignore = ["ASYNC230", "SIM115"]
