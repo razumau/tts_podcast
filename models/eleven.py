@@ -6,7 +6,17 @@ from elevenlabs.client import ElevenLabs
 
 from models.base import BaseTTS, TTSMetadata
 
-GOOD_VOICES = ["Xb7hH8MSUJpSbSDYk0k2", "XB0fDUnXU5powFXDhCwa", "onwK4e9ZLuTAKqWW03F9", "ThT5KcBeYPX3keUQqHPh"]
+GOOD_VOICES = [
+    "Xb7hH8MSUJpSbSDYk0k2",  # Alice
+    "XB0fDUnXU5powFXDhCwa",  # Helen
+    "onwK4e9ZLuTAKqWW03F9",  # Daniel
+    "ThT5KcBeYPX3keUQqHPh",  # Evelyn
+    "JBFqnCBsd6RMkjVDRZzb",  # George
+    "XrExE9yKIg1WjnnlVkGX",  # Matilda
+    "hpp4J3VqNfWAUOO0d1Us",  # Bella
+    "pFZP5JQG7iQjIQuC4Bku",  # Lily
+    "DbwWo4rVEd5NrejHYUnm"   # Jessica
+]
 
 AVAILABLE_MODELS = {
     "eleven": "eleven_flash_v2_5",
